@@ -3,36 +3,36 @@ import { getConnectedUsers, getIO } from "../socket/socket.server.js";
 
 export const swipeRight = async (req, res) => {
 	try {
-		const { likedUserId } = req.params;
+		const { businessID } = req.params;
 		const currentUser = await User.findById(req.user.id);
-		const likedUser = await User.findById(likedUserId);
+		const likedUser = await User.findById(businessID);
 
-		if (!likedUser) {
+		if (!business) {
 			return res.status(404).json({
 				success: false,
-				message: "User not found",
+				message: "Business not found",
 			});
 		}
 
-		if (!currentUser.likes.includes(likedUserId)) {
-			currentUser.likes.push(likedUserId);
+		if (!currentUser.likes.includes(businessID)) {
+			currentUser.likes.push(businessID);
 			await currentUser.save();
 
 			// if the other user already liked us, it's a match, so let's update both users
-			if (likedUser.likes.includes(currentUser.id)) {
-				currentUser.matches.push(likedUserId);
-				likedUser.matches.push(currentUser.id);
+			if (business.likes.includes(currentUser.id)) {
+				currentUser.matches.push(businessID);
+				business.matches.push(currentUser.id);
 
-				await Promise.all([await currentUser.save(), await likedUser.save()]);
+				await Promise.all([await currentUser.save(), await business.save()]);
 
 				// send notification in real-time with socket.io
 				const connectedUsers = getConnectedUsers();
 				const io = getIO();
 
-				const likedUserSocketId = connectedUsers.get(likedUserId);
+				const businessSocketId = connectedUsers.get(businessID);
 
-				if (likedUserSocketId) {
-					io.to(likedUserSocketId).emit("newMatch", {
+				if (businessSocketId) {
+					io.to(businessSocketId).emit("newMatch", {
 						_id: currentUser._id,
 						name: currentUser.name,
 						image: currentUser.image,
@@ -42,9 +42,9 @@ export const swipeRight = async (req, res) => {
 				const currentSocketId = connectedUsers.get(currentUser._id.toString());
 				if (currentSocketId) {
 					io.to(currentSocketId).emit("newMatch", {
-						_id: likedUser._id,
-						name: likedUser.name,
-						image: likedUser.image,
+						_id: business._id,
+						name: business.name,
+						image: business.image,
 					});
 				}
 			}
@@ -66,7 +66,7 @@ export const swipeRight = async (req, res) => {
 
 export const swipeLeft = async (req, res) => {
 	try {
-		const { dislikedUserId } = req.params;
+		const { dislikedBusinessId } = req.params;
 		const currentUser = await User.findById(req.user.id);
 
 		if (!currentUser.dislikes.includes(dislikedUserId)) {
@@ -116,13 +116,6 @@ export const getUserProfiles = async (req, res) => {
 				{ _id: { $nin: currentUser.likes } },
 				{ _id: { $nin: currentUser.dislikes } },
 				{ _id: { $nin: currentUser.matches } },
-				{
-					gender:
-						currentUser.genderPreference === "both"
-							? { $in: ["male", "female"] }
-							: currentUser.genderPreference,
-				},
-				{ genderPreference: { $in: [currentUser.gender, "both"] } },
 			],
 		});
 

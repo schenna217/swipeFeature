@@ -5,66 +5,41 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const maleNames = ["James", "John", "Robert", "Michael", "William", "David", "Richard", "Joseph", "Thomas"];
+const investors = ["James", "Mary", "Robert", "Patricia", "William", "Jennifer", "Richard", "Linda", "Thomas", "Karen"];
 
-const femaleNames = [
-	"Mary",
-	"Patricia",
-	"Jennifer",
-	"Linda",
-	"Elizabeth",
-	"Barbara",
-	"Susan",
-	"Jessica",
-	"Sarah",
-	"Karen",
-	"Nancy",
-	"Lisa",
-];
-
-const genderPreferences = ["male", "female", "both"];
-
-const bioDescriptors = [
-	"Coffee addict",
+const businesses = [
+	"Coffee shop",
 	"Cat lover",
-	"Dog person",
-	"Foodie",
-	"Gym rat",
-	"Bookworm",
-	"Movie buff",
-	"Music lover",
-	"Travel junkie",
-	"Beach bum",
-	"City slicker",
-	"Outdoor enthusiast",
-	"Netflix binger",
-	"Yoga enthusiast",
-	"Craft beer connoisseur",
-	"Sushi fanatic",
-	"Adventure seeker",
-	"Night owl",
-	"Early bird",
-	"Aspiring chef",
+	"Restaurant",
+	"Gymnasium",
+	"Movie theater",
+	"Music shop",
+	"Travel agency",
+	"Park Ranger Service",
+	"Video Rental",
+	"Yoga Studio",
+	"Brewery",
+	"Sushi shop",
+	"Hiking tour agency",
+	"Culinary Academy",
 ];
 
 const generateBio = () => {
-	const descriptors = bioDescriptors.sort(() => 0.5 - Math.random()).slice(0, 3);
+	const descriptors = businesses.sort(() => 0.5 - Math.random()).slice(0, 3);
 	return descriptors.join(" | ");
 };
 
 const generateRandomUser = (gender, index) => {
-	const names = gender === "male" ? maleNames : femaleNames;
-	const name = names[index];
+	const names = investors === "Investor" ? investors : businesses;
+	const name = investors[index];
 	const age = Math.floor(Math.random() * (45 - 21 + 1) + 21);
 	return {
 		name,
 		email: `${name.toLowerCase()}${age}@example.com`,
 		password: bcrypt.hashSync("password123", 10),
 		age,
-		gender,
-		genderPreference: genderPreferences[Math.floor(Math.random() * genderPreferences.length)],
 		bio: generateBio(),
-		image: `/${gender}/${index + 1}.jpg`,
+		image: `/${investors}/${index + 1}.jpg`,
 	};
 };
 
@@ -74,10 +49,7 @@ const seedUsers = async () => {
 
 		await User.deleteMany({});
 
-		const maleUsers = maleNames.map((_, i) => generateRandomUser("male", i));
-		const femaleUsers = femaleNames.map((_, i) => generateRandomUser("female", i));
-
-		const allUsers = [...maleUsers, ...femaleUsers];
+		const allUsers = [...investors];
 
 		await User.insertMany(allUsers);
 

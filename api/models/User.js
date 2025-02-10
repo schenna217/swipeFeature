@@ -20,15 +20,13 @@ const userSchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
-		gender: {
-			type: String,
+		amounttToSpend: {
+			type: Number,
 			required: true,
-			enum: ["male", "female"],
 		},
-		genderPreference: {
+		businessType: {
 			type: String,
 			required: true,
-			enum: ["male", "female", "both"],
 		},
 		bio: { type: String, default: "" },
 		image: { type: String, default: "" },
